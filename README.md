@@ -12,7 +12,16 @@ Azure Log Analytics
 Defender XDR
 SIEM and SOC platforms
 
+<img width="1582" height="974" alt="Screenshot 2026-03-23 at 11 04 33 PM" src="https://github.com/user-attachments/assets/e10ca683-e53a-42d0-bf3e-053e7558e9bd" />
+
+
 It bridges the gap between human intent and technical query syntax, making detection engineering faster and more accessible.
+
+<img width="1582" height="974" alt="Screenshot 2026-03-23 at 11 05 15 PM" src="https://github.com/user-attachments/assets/c4d28d54-8661-453a-930a-e688765eec70" />
+
+
+<img width="1582" height="974" alt="image" src="https://github.com/user-attachments/assets/b2851667-ab62-490e-a45d-259f7117a498" />
+
 
 🎯 Purpose
 
@@ -36,6 +45,7 @@ Easy to deploy and extend
 SOC-friendly design
 Beginner-friendly interface
 Fast response generation
+
 
 
 
