@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel Query Forge</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --navy: #0f2744;
+            --navy-mid: #1a3c5e;
+            --navy-light: #1e4976;
+            --white: #f8fafc;
+            --off-white: #eef2f7;
+            --muted: #94aac4;
+            --accent: #3b82f6;
+            --accent-b: #60a5fa;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 36px 24px 60px;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--accent), #1d4ed8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+            flex-shrink: 0;
+        }
+
+        .brand h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .brand p {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            box-shadow: 0 0 6px var(--danger);
+            transition: all 0.3s;
+        }
+
+        .status-dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 6px var(--success);
+        }
+
+        .status-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* FREE BADGE */
+        .free-badge {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #34d399;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* API KEY BANNER */
+        .api-banner {
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 20px;
+        }
+
+        .api-banner-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .api-banner-top .icon {
+            font-size: 20px;
+        }
+
+        .api-banner-top strong {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .api-banner-top p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .free-note {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #6ee7b7;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .free-note a {
+            color: #34d399;
+            text-decoration: underline;
+        }
+
+        .api-key-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .api-key-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .api-key-wrap input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--white);
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            padding: 10px 42px 10px 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .api-key-wrap input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .toggle-vis {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 15px;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .toggle-vis:hover {
+            color: var(--white);
+        }
+
+        .save-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .save-btn:hover {
+            background: #2563eb;
+        }
+
+        .clear-btn {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 8px;
+            color: #fca5a5;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .key-saved {
+            font-size: 11px;
+            color: var(--success);
+            margin-top: 8px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .key-saved.show {
+            display: flex;
+        }
+
+        /* TABS */
+        .mode-tabs {
+            display: flex;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .tab-btn:not(.active):hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* SETTINGS */
+        .settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        select,
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9px;
+            color: var(--white);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            padding: 12px 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        textarea {
+            min-height: 110px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+        }
+
+        select option {
+            background: var(--navy-mid);
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .card-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        /* GEN BUTTON */
+        .gen-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent) 0%, #1d4ed8 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
+        }
+
+        .gen-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(59, 130, 246, 0.5);
+        }
+
+        .gen-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        /* OUTPUT */
+        .output-card {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .output-card.show {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .output-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse {
+            width: 7px;
+            height: 7px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: var(--white);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .kql-block {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+            padding: 18px;
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            line-height: 1.85;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-x: auto;
+        }
+
+        .explain-block {
+            font-size: 14px;
+            line-height: 1.75;
+            color: var(--off-white);
+            white-space: pre-wrap;
+        }
+
+        .kw {
+            color: #60a5fa;
+            font-weight: 500;
+        }
+
+        .tbl {
+            color: #34d399;
+        }
+
+        .str {
+            color: #fbbf24;
+        }
+
+        .op {
+            color: #f472b6;
+        }
+
+        .cmt {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* SHIMMER */
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 6px;
+            height: 14px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* ERROR */
+        .error-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 9px;
+            padding: 13px 16px;
+            color: #fca5a5;
+            font-size: 13px;
+            line-height: 1.5;
+            display: none;
+            margin-bottom: 14px;
+        }
+
+        .error-box.show {
+            display: block;
+        }
+
+        /* HISTORY */
+        .history-section {
+            margin-top: 32px;
+        }
+
+        .history-title {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .history-num {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 2px 6px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .history-text {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .history-text strong {
+            color: var(--white);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .settings-row {
+                grid-template-columns: 1fr;
+            }
+
+            .api-key-row {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <!-- HEADER -->
+        <header>
+            <div class="logo">🛡️</div>
+            <div class="brand">
+                <h1>Sentinel Query Forge</h1>
+                <p>Natural Language → KQL • Powered by Groq</p>
+            </div>
+            <div class="header-right">
+                <span class="free-badge">Free</span>
+                <div class="status-dot" id="statusDot"></div>
+                <span class="status-label" id="statusLabel">No Key</span>
+            </div>
+        </header>
+
+        <!-- API KEY BANNER -->
+        <div class="api-banner">
+            <div class="api-banner-top">
+                <span class="icon">🔑</span>
+                <div>
+                    <strong>Groq API Key (Free Tier)</strong>
+                    <p>Stored in your browser session only — never leaves your device except to Groq's API.</p>
+                </div>
+            </div>
+            <div class="api-key-row">
+                <div class="api-key-wrap">
+                    <input type="password" id="apiKeyInput" placeholder="Paste your Groq API key here (gsk_...)"
+                        autocomplete="off" />
+                    <button class="toggle-vis" onclick="toggleVis()" title="Show/hide">👁</button>
+                </div>
+                <button class="save-btn" onclick="saveKey()">Save Key</button>
+                <button class="clear-btn" id="clearBtn" onclick="clearKey()">Clear</button>
+            </div>
+            <div class="key-saved" id="keySaved">✅ Groq key saved for this session</div>
+        </div>
+
+        <!-- MODE TABS -->
+        <div class="mode-tabs">
+            <button class="tab-btn active" onclick="setMode('generate')" id="tab-generate">⚡ Generate KQL</button>
+            <button class="tab-btn" onclick="setMode('explain')" id="tab-explain">🔍 Explain KQL</button>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="settings-row">
+            <div class="field">
+                <label>Groq Model</label>
+                <select id="modelSelect">
+                    <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Best Quality)</option>
+                    <option value="llama-3.1-8b-instant">Llama 3.1 8B (Fastest)</option>
+                    <option value="moonshotai/kimi-k2-instruct-0905">Kimi K2 (Great for code)</option>
+                    <option value="qwen/qwen-3-32b">Qwen 3 32B (Strong reasoning)</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Target Platform</label>
+                <select id="platformSelect">
+                    <option value="Microsoft Sentinel">Microsoft Sentinel</option>
+                    <option value="Azure Data Explorer">Azure Data Explorer</option>
+                    <option value="Log Analytics Workspace">Log Analytics Workspace</option>
+                    <option value="Defender XDR">Defender XDR</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- INPUT CARDS -->
+        <div class="card" id="generateCard">
+            <div class="card-label">✏️ Describe what you want to detect or query</div>
+            <textarea id="naturalInput"
+                placeholder="e.g. Show all failed logins in the last 24 hours from IPs outside India, grouped by user and IP, sorted by count..."></textarea>
+        </div>
+
+        <div class="card" id="explainCard" style="display:none">
+            <div class="card-label">📋 Paste your KQL query to explain</div>
+            <textarea id="kqlInput"
+                placeholder="SecurityEvent&#10;| where EventID == 4625&#10;| summarize count() by Account, IpAddress&#10;| order by count_ desc"></textarea>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error-box" id="errorBox"></div>
+
+        <!-- BUTTON -->
+        <button class="gen-btn" id="genBtn" onclick="runQuery()">
+            <span id="btnIcon">⚡</span>
+            <span id="btnText">Generate KQL Query</span>
+        </button>
+
+        <!-- OUTPUT -->
+        <div class="output-card card" id="outputCard" style="margin-top:18px;">
+            <div class="output-header">
+                <div class="output-label">
+                    <div class="pulse"></div><span id="outputLabel">Generated Query</span>
+                </div>
+                <button class="copy-btn" onclick="copyOutput()">📋 Copy</button>
+            </div>
+            <div id="outputContent"></div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="history-section" id="historySection" style="display:none">
+            <div class="history-title">Recent Queries</div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+
+    </div>
+    <script>
+        let currentMode = 'generate';
+        let queryHistory = [];
+        let apiKey = sessionStorage.getItem('groq_api_key') || '';
+
+        if (apiKey) {
+            document.getElementById('apiKeyInput').value = apiKey;
+            setKeyStatus(true);
+        }
+
+        function saveKey() {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            if (!val || !val.startsWith('gsk_')) {
+                showError('⚠️ That doesn\'t look like a valid Groq API key. It should start with gsk_ — get it from console.groq.com/keys');
+                return;
+            }
+            apiKey = val;
+            sessionStorage.setItem('groq_api_key', apiKey);
+            setKeyStatus(true);
+            document.getElementById('errorBox').classList.remove('show');
+        }
+
+        function clearKey() {
+            apiKey = '';
+            sessionStorage.removeItem('groq_api_key');
+            document.getElementById('apiKeyInput').value = '';
+            setKeyStatus(false);
+        }
+
+        function setKeyStatus(on) {
+            document.getElementById('statusDot').classList.toggle('connected', on);
+            document.getElementById('statusLabel').textContent = on ? 'Connected' : 'No Key';
+            document.getElementById('keySaved').classList.toggle('show', on);
+            document.getElementById('clearBtn').style.display = on ? 'block' : 'none';
+        }
+
+        function toggleVis() {
+            const inp = document.getElementById('apiKeyInput');
+            const btn = document.querySelector('.toggle-vis');
+            inp.type = inp.type === 'password' ? 'text' : 'password';
+            btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('tab-generate').classList.toggle('active', mode === 'generate');
+            document.getElementById('tab-explain').classList.toggle('active', mode === 'explain');
+            document.getElementById('generateCard').style.display = mode === 'generate' ? 'block' : 'none';
+            document.getElementById('explainCard').style.display = mode === 'explain' ? 'block' : 'none';
+            document.getElementById('btnIcon').textContent = mode === 'generate' ? '⚡' : '🔍';
+            document.getElementById('btnText').textContent = mode === 'generate' ? 'Generate KQL Query' : 'Explain This Query';
+            document.getElementById('outputCard').classList.remove('show');
+        }
+
+        function showLoading() {
+            document.getElementById('outputCard').classList.add('show');
+            document.getElementById('outputLabel').textContent = currentMode === 'generate' ? 'Generating...' : 'Analysing...';
+            document.getElementById('outputContent').innerHTML = `
+      <div class="shimmer" style="width:80%"></div>
+      <div class="shimmer" style="width:60%"></div>
+      <div class="shimmer" style="width:90%"></div>
+      <div class="shimmer" style="width:50%"></div>
+      <div class="shimmer" style="width:72%"></div>`;
+        }
+
+        function highlightKQL(code) {
+            const keywords = ['where', 'summarize', 'extend', 'project', 'order by', 'sort by', 'join', 'let',
+                'count', 'by', 'on', 'ago', 'between', 'in', 'contains', 'has', 'startswith', 'endswith',
+                'matches regex', 'render', 'take', 'limit', 'top', 'distinct', 'mv-expand', 'parse', 'evaluate',
+                'union', 'range', 'make-series', 'bin', 'now', 'datetime', 'tostring', 'toint', 'todouble',
+                'tobool', 'format_datetime', 'strcat', 'split', 'trim', 'extract', 'iff', 'case', 'coalesce',
+                'isnotempty', 'isempty', 'isnull', 'isnotnull', 'dynamic', 'datatable', 'print'];
+
+            let out = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            out = out.replace(/(\/\/[^\n]*)/g, '<span class="cmt">$1</span>');
+            out = out.replace(/"([^"]*)"/g, '<span class="str">"$1"</span>');
+            out = out.replace(/'([^']*)'/g, "<span class='str'>'$1'</span>");
+            keywords.forEach(kw => {
+                const re = new RegExp(`\\b(${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'gi');
+                out = out.replace(re, '<span class="kw">$1</span>');
+            });
+            out = out.replace(/^(\w+)/m, '<span class="tbl">$1</span>');
+            out = out.replace(/\|/g, '<span class="op">|</span>');
+            return out;
+        }
+
+        async function runQuery() {
+            if (!apiKey) { showError('⚠️ Please enter and save your Groq API key first.'); return; }
+
+            const platform = document.getElementById('platformSelect').value;
+            const model = document.getElementById('modelSelect').value;
+            document.getElementById('errorBox').classList.remove('show');
+
+            let userMessage = '';
+            let systemPrompt = '';
+
+            if (currentMode === 'generate') {
+                userMessage = document.getElementById('naturalInput').value.trim();
+                if (!userMessage) { showError('Please describe what you want to detect or query.'); return; }
+                systemPrompt = `You are an expert KQL (Kusto Query Language) engineer specializing in ${platform}.
+Convert natural language descriptions into precise, production-ready KQL queries.
+Rules:
+- Output ONLY the raw KQL query — no markdown fences, no backticks, no explanation before or after
+- Add short inline comments (// comment) to explain key lines
+- Use realistic table names for ${platform}: SecurityEvent, SigninLogs, AuditLogs, DeviceLogonEvents, OfficeActivity, CommonSecurityLog, etc.
+- Write clean, efficient, well-structured queries optimized for ${platform}`;
+            } else {
+                userMessage = document.getElementById('kqlInput').value.trim();
+                if (!userMessage) { showError('Please paste a KQL query to explain.'); return; }
+                systemPrompt = `You are a senior SOC analyst and KQL expert specializing in ${platform}.
+Explain KQL queries in plain English for security analysts.
+- Walk through each part of the query step by step
+- Describe the security use case it serves
+- Mention any improvements or caveats
+- Be concise, clear and practical`;
+                userMessage = `Explain this KQL query:\n\n${userMessage}`;
+            }
+
+            document.getElementById('genBtn').disabled = true;
+            showLoading();
+
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model,
+                        temperature: 0.2,
+                        max_tokens: 1024,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userMessage }
+                        ]
+                    })
+                });
+
+                if (res.status === 401) throw new Error('Invalid API key. Check your key at console.groq.com/keys');
+                if (res.status === 429) throw new Error('Rate limit reached. Groq free tier allows 14,400 req/day — try again shortly.');
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err?.message || `Groq API error ${res.status}`);
+                }
+
+                const data = await res.json();
+                // Groq uses OpenAI-compatible response format
+                const output = data?.choices?.[0]?.message?.content?.trim() || '';
+
+                if (!output) throw new Error('Empty response from Groq. Try again.');
+
+                // Strip any markdown fences if model added them
+                const clean = output.replace(/^```[a-z]*\n?/i, '').replace(/```$/, '').trim();
+
+                document.getElementById('outputCard').classList.add('show');
+                document.getElementById('outputLabel').textContent =
+                    currentMode === 'generate' ? '✅ KQL Query Ready' : '✅ Explanation Ready';
+
+                if (currentMode === 'generate') {
+                    document.getElementById('outputContent').innerHTML =
+                        `<div class="kql-block">${highlightKQL(clean)}</div>`;
+                } else {
+                    document.getElementById('outputContent').innerHTML =
+                        `<div class="explain-block">${clean.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`;
+                }
+
+                addHistory(currentMode === 'generate'
+                    ? document.getElementById('naturalInput').value.trim()
+                    : document.getElementById('kqlInput').value.trim(), clean);
+
+            } catch (err) {
+                document.getElementById('outputCard').classList.remove('show');
+                showError('⚠️ ' + (err.message || 'Something went wrong. Please try again.'));
+            } finally {
+                document.getElementById('genBtn').disabled = false;
+            }
+        }
+
+        function showError(msg) {
+            const box = document.getElementById('errorBox');
+            box.innerHTML = msg;
+            box.classList.add('show');
+        }
+
+        function copyOutput() {
+            const el = document.getElementById('outputContent');
+            navigator.clipboard.writeText(el.innerText || el.textContent).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.innerHTML = '📋 Copy', 1600);
+            });
+        }
+
+        function addHistory(input, output) {
+            queryHistory.unshift({ input, output, mode: currentMode });
+            if (queryHistory.length > 8) queryHistory.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const section = document.getElementById('historySection');
+            const list = document.getElementById('historyList');
+            if (!queryHistory.length) { section.style.display = 'none'; return; }
+            section.style.display = 'block';
+            list.innerHTML = queryHistory.map((h, i) => `
+      <div class="history-item" onclick="loadHistory(${i})">
+        <span class="history-num">#${queryHistory.length - i}</span>
+        <div class="history-text">
+          <strong>${h.mode === 'generate' ? '⚡' : '🔍'} ${h.input.substring(0, 80)}${h.input.length > 80 ? '…' : ''}</strong>
+          ${h.output.substring(0, 100)}${h.output.length > 100 ? '…' : ''}
+        </div>
+      </div>`).join('');
+        }
+
+        function loadHistory(i) {
+            const h = queryHistory[i];
+            setMode(h.mode);
+            if (h.mode === 'generate') document.getElementById('naturalInput').value = h.input;
+            else document.getElementById('kqlInput').value = h.input;
+            document.getElementById('outputCard').classList.add('show');
+            document.getElementById('outputLabel').textContent =
+                h.mode === 'generate' ? '✅ KQL Query Ready' : '✅ Explanation Ready';
+            if (h.mode === 'generate') {
+                document.getElementById('outputContent').innerHTML =
+                    `<div class="kql-block">${highlightKQL(h.output)}</div>`;
+            } else {
+                document.getElementById('outputContent').innerHTML =
+                    `<div class="explain-block">${h.output}</div>`;
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runQuery();
+        });
+    </script>
+</body>
+
+</html>
