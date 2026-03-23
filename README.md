@@ -36,3 +36,7 @@ Easy to deploy and extend
 SOC-friendly design
 Beginner-friendly interface
 Fast response generation
+
+
+
+
